@@ -1,0 +1,19 @@
+sdsio:
+  interface:
+    socket:
+      ipaddr: 127.0.0.1
+      port: 5100
+      connect:
+
+  workdir: .
+  metadir: .
+
+  streams:
+    - name: Pose_In
+      view: image
+    - name: Pose_Out
+      view: csv
+
+  play:
+    - step: "Synthetic pose frames"
+      labels: [ 0 ]

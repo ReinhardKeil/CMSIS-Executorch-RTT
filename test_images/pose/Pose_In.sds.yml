@@ -1,0 +1,10 @@
+sds:
+  name: Pose estimation RGB input
+  description: Synthetic full-body poses for camera-free DevKit-E7 testing
+  sample-frequency: 2
+  content:
+    - image:
+        pixel_format: RGB888
+        width: 64
+        height: 64
+        stride_bytes: 192

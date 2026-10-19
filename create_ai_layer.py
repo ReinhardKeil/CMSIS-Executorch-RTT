@@ -174,6 +174,8 @@ def model_params(mlops: dict) -> dict:
             params["input_shape"] = tuple(int(d) for d in re.split(r"[x,]", str(value)))
         elif key == "calibration-samples":
             params["calibration_samples"] = int(value)
+        elif key == "module":
+            params["module"] = str(value)
         elif key not in ("clayer", "name"):
             print(f"[ai_layer] warning: ignoring unknown model key {key!r}", file=sys.stderr)
     if params:
@@ -190,10 +192,15 @@ def export_model(spec, params: dict) -> bytes:
     from torchao.quantization.pt2e.quantize_pt2e import convert_pt2e, prepare_pt2e
 
     sys.path.insert(0, str(HERE / "model"))
-    from model import get_calibration_inputs, get_model
+    module_name = params.pop("module", None)
+    if module_name is None:
+        module_name = "model"
+    model_module = __import__(module_name, fromlist=["get_calibration_inputs", "get_model"])
+    get_model = model_module.get_model
+    get_calibration_inputs = model_module.get_calibration_inputs
 
     model = get_model(**{k: v for k, v in params.items() if k == "input_shape"})
-    samples = get_calibration_inputs(**params)
+    samples = get_calibration_inputs(**{k: v for k, v in params.items() if k != "module"})
     example = (samples[0],)
     graph = torch.export.export(model, example).module()
 
